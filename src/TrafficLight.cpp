@@ -21,7 +21,7 @@ void MessageQueue<T>::send(T &&msg)
 {
     std::lock_guard<std::mutex> uLock(_mutexMsgQueue);
   	_queue.clear(); // Needed to vehicles stop in red light of surrounding traffic lights 
-    _queue.push_back(std::move(msg));
+    _queue.emplace_back(std::move(msg));
     _conditionMsgQueue.notify_one();
 }
 
@@ -60,8 +60,8 @@ void TrafficLight::cycleThroughPhases()
 {
   	// Random value generation logic below was based on https://stackoverflow.com/questions/7560114/random-number-c-in-some-range
   	std::random_device rd; // obtain a random number from hardware
-    std::mt19937 genLight(rd()); // seed the generator
-    std::uniform_int_distribution<> distr(4000, 6000); // define the range
+    static std::mt19937 genLight(rd()); // seed the generator
+    static std::uniform_int_distribution<> distr(4000, 6000); // define the range
   
 	double cycleDurationTraffic = distr(genLight); // duration of a single simulation cycle in ms  	
   	std::chrono::time_point<std::chrono::system_clock> lastUpdateTraffic;
